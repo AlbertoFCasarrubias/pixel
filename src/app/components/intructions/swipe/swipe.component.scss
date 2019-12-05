@@ -1,0 +1,13 @@
+.instrucciones{
+  width: 100%;
+  height: 15px;
+  color: var(--ion-color-step-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .text{
+    font-size: 10px;
+    padding-right: 10px;
+  }
+}

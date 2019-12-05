@@ -1,0 +1,6 @@
+<div class="instrucciones" *ngIf="show !== 'false'">
+    <span class="text">
+        {{text}}
+    </span>
+    <ion-icon slot="icon-only" name="close-circle-outline" (click)="dontShow()"></ion-icon>
+</div>
