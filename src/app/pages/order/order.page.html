@@ -1,14 +1,44 @@
 <ion-header>
     <ion-toolbar>
         <ion-buttons slot="start">
-            <ion-menu-button></ion-menu-button>
+            <ion-back-button></ion-back-button>
         </ion-buttons>
         <ion-title>
-            Orden
+            Orden de trabajo
         </ion-title>
     </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
+    <div (click)="addItem()">
+        agregar item agregar item agregar item agregar item
+    </div>
+    <form class="form" [formGroup]="form" (ngSubmit)="submit(form.value)">
+        <ion-list>
+            <ion-item>
+                <ion-label position="stacked">Fecha</ion-label>
+                <ion-input formControlName="date"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label position="stacked">Cliente</ion-label>
+                <ion-input formControlName="client" ></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label position="stacked">Notas</ion-label>
+                <ion-input formControlName="notes"></ion-input>
+            </ion-item>
+            <ion-item formArrayName="items"
+                 *ngFor="let arrayItem of arrayItems; let i=index">
 
+                <input [id]="arrayItem.id" type="checkbox"
+                       [formControl]="form.controls.items.value[i]">
+                <label [for]="arrayItem.id" class="array-item-title">
+                    {{arrayItem.pieces}}</label>
+
+            </ion-item>
+            <ion-item lines="none" class="ion-text-center">
+                <ion-button expand="block" type="submit" [disabled]="!form.valid">Guardar</ion-button>
+            </ion-item>
+        </ion-list>
+    </form>
 </ion-content>

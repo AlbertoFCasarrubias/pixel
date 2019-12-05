@@ -4,9 +4,9 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { OrderPageRoutingModule } from './order-routing.module';
+import { ClientPageRoutingModule } from './client-routing.module';
 
-import { OrderPage } from './order.page';
+import { ClientPage } from './client.page';
 
 @NgModule({
   imports: [
@@ -14,8 +14,8 @@ import { OrderPage } from './order.page';
     FormsModule,
     IonicModule,
     ReactiveFormsModule,
-    OrderPageRoutingModule
+    ClientPageRoutingModule
   ],
-  declarations: [OrderPage]
+  declarations: [ClientPage]
 })
-export class OrderPageModule {}
+export class ClientPageModule {}

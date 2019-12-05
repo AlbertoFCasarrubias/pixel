@@ -1,28 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {AlertController, LoadingController} from '@ionic/angular';
-import {FirebaseService} from '../../services/firebase/firebase.service';
+import {FirebaseService} from '../../../services/firebase/firebase.service';
 import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
-  selector: 'app-order',
-  templateUrl: './order.page.html',
-  styleUrls: ['./order.page.scss'],
+  selector: 'app-client',
+  templateUrl: './client.page.html',
+  styleUrls: ['./client.page.scss'],
 })
-export class OrderPage implements OnInit {
+export class ClientPage implements OnInit {
 
   client: any;
   form: FormGroup;
-  itemForm: FormGroup;
   loading: any;
-
-  arrayItems: {
-    id: number;
-    pieces: number;
-    width: number;
-    height: number;
-    total: number;
-  }[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -34,19 +25,17 @@ export class OrderPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.arrayItems = [];
-    this.itemForm = this.formBuilder.group({
-      pieces: new FormControl(''),
-      width: new FormControl(''),
-      height: new FormControl('' ),
-      total: new FormControl('' )
-    });
-
     this.form = this.formBuilder.group({
-      date: new FormControl(''),
-      client: new FormControl(''),
-      notes: new FormControl(''),
-      items: this.formBuilder.array([])
+      name: new FormControl('', Validators.compose([Validators.required])),
+      email: new FormControl('', Validators.compose([Validators.email])),
+      phone: new FormControl('' ),
+      address: this.formBuilder.group({
+        street: new FormControl(''),
+        neighborhood: new FormControl(''),
+        zip: new FormControl('' ),
+        city: new FormControl('' ),
+        country: new FormControl('México')
+      })
     });
 
     const id = this.activatedRoute.snapshot.paramMap.get('id');
@@ -123,23 +112,6 @@ export class OrderPage implements OnInit {
   saveError(err) {
     this.dismissLoading();
     this.presentAlert('Cliente', err.toString());
-  }
-
-  addItem() {
-    const items = this.form.controls.item.value;
-    this.arrayItems.push({
-      id: 1,
-      pieces: 11,
-      width: 1,
-      height: 1,
-      total: 2
-    });
-    items.push(this.formBuilder.control(false));
-  }
-  removeItem() {
-    const items = this.form.controls.item.value;
-    this.arrayItems.pop();
-    items.removeAt(items.length - 1);
   }
 
 }

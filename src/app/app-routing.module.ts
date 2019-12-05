@@ -41,6 +41,21 @@ const routes: Routes = [
     path: 'materials',
     loadChildren: () => import('./pages/materials/materials.module').then( m => m.MaterialsPageModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'clients',
+    loadChildren: () => import('./pages/clients/clients.module').then( m => m.ClientsPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'client',
+    loadChildren: () => import('./pages/clients/client/client.module').then( m => m.ClientPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'client/:id',
+    loadChildren: () => import('./pages/clients/client/client.module').then( m => m.ClientPageModule),
+    canActivate: [AuthGuard]
   }
 ];
 

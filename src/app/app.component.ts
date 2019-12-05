@@ -25,9 +25,14 @@ export class AppComponent {
       icon: 'list'
     },
     {
-      title: 'Order',
+      title: 'Orden de trabajo',
       url: '/order',
       icon: 'today'
+    },
+    {
+      title: 'Clientes',
+      url: '/clients',
+      icon: 'people'
     },
     {
       title: 'Materiales',
