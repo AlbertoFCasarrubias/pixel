@@ -8,6 +8,7 @@ import {
 import {AlertController, LoadingController} from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirebaseService } from '../../../services/firebase/firebase.service';
+import {RoutingService} from '../../../services/routing/routing.service';
 
 @Component({
   selector: 'app-material',
@@ -25,6 +26,7 @@ export class MaterialPage implements OnInit {
     public loadingController: LoadingController,
     public firebaseService: FirebaseService,
     private activatedRoute: ActivatedRoute,
+    private routingService: RoutingService,
     private router: Router
   ) {}
 
@@ -47,7 +49,12 @@ export class MaterialPage implements OnInit {
       buttons: [{
         text: 'Aceptar',
         handler: () => {
-          this.router.navigate(['/materials']);
+          if (this.routingService.getPreviousUrl() === '/order') {
+            this.router.navigate(['/order']);
+          }
+          else {
+            this.router.navigate(['/materials']);
+          }
         }
       }]
     });

@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {AlertController, LoadingController} from '@ionic/angular';
 import {FirebaseService} from '../../../services/firebase/firebase.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RoutesRecognized} from '@angular/router';
+import {filter, pairwise} from 'rxjs/operators';
+import {RoutingService} from '../../../services/routing/routing.service';
 
 @Component({
   selector: 'app-client',
@@ -21,6 +23,7 @@ export class ClientPage implements OnInit {
     public loadingController: LoadingController,
     public firebaseService: FirebaseService,
     private activatedRoute: ActivatedRoute,
+    private routingService: RoutingService,
     private router: Router
   ) {}
 
@@ -51,7 +54,15 @@ export class ClientPage implements OnInit {
       buttons: [{
         text: 'Aceptar',
         handler: () => {
-          this.router.navigate(['/clients']);
+          if (this.routingService.getPreviousUrl() === '/order') {
+            this.router.navigate(['/order']);
+          }
+          else {
+            this.router.navigate(['/clients']);
+          }
+
+
+
         }
       }]
     });
@@ -96,7 +107,6 @@ export class ClientPage implements OnInit {
         .then(() => this.savedOK(value))
         .catch(err => this.saveError(err));
     } else {
-      console.log('VALUE ', value);
       this.firebaseService
         .createClient(value)
         .then(() => this.savedOK(value))

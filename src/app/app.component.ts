@@ -6,6 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {Router} from '@angular/router';
 import {AuthService} from './services/auth/auth.service';
+import {RoutingService} from './services/routing/routing.service';
 
 @Component({
   selector: 'app-root',
@@ -15,17 +16,12 @@ import {AuthService} from './services/auth/auth.service';
 export class AppComponent {
   public appPages = [
     {
-      title: 'Home',
+      title: 'Ordenes de trabajo',
       url: '/home',
       icon: 'home'
     },
     {
-      title: 'List',
-      url: '/list',
-      icon: 'list'
-    },
-    {
-      title: 'Orden de trabajo',
+      title: 'Agregar orden de trabajo',
       url: '/order',
       icon: 'today'
     },
@@ -53,9 +49,11 @@ export class AppComponent {
     private statusBar: StatusBar,
     public afAuth: AngularFireAuth,
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private routingService: RoutingService,
   ) {
     this.initializeApp();
+    routingService.loadRouting();
   }
 
   initializeApp() {

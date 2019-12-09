@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import { Location } from '@angular/common';
+import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {AlertController, LoadingController} from '@ionic/angular';
 import {FirebaseService} from '../../services/firebase/firebase.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import * as moment from 'moment';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'app-order',
@@ -11,7 +14,9 @@ import {ActivatedRoute, Router} from '@angular/router';
 })
 export class OrderPage implements OnInit {
 
-  client: any;
+  order: any;
+  clients: any;
+  materials: any;
   form: FormGroup;
   itemForm: FormGroup;
   loading: any;
@@ -25,6 +30,7 @@ export class OrderPage implements OnInit {
   }[];
 
   constructor(
+    private location: Location,
     private formBuilder: FormBuilder,
     public alertController: AlertController,
     public loadingController: LoadingController,
@@ -36,21 +42,59 @@ export class OrderPage implements OnInit {
   ngOnInit() {
     this.arrayItems = [];
 
+    this.getInfo();
+
     this.form = this.formBuilder.group({
-      date: new FormControl(''),
+      date: new FormControl(moment().format('YYYY-MM-DD')),
       client: new FormControl(''),
+      material: new FormControl(''),
       notes: new FormControl(''),
       items: this.formBuilder.array([this.createItem()])
     });
 
     const id = this.activatedRoute.snapshot.paramMap.get('id');
     if (id) {
-      this.getClient(id);
+      // this.getClient(id);
     }
+  }
+
+  getInfo() {
+    const promises = [];
+    this.presentLoading().then(()=>
+    {
+      promises.push(new Promise((resolve, reject) => {
+        this.firebaseService.getClients()
+          .subscribe(clients => {
+              this.clients = clients;
+              resolve(true);
+            },
+            err => {
+              reject(false);
+            });
+      }));
+
+      promises.push(new Promise((resolve, reject) => {
+        this.firebaseService.getMaterials()
+          .subscribe(materials => {
+              this.materials = materials;
+              resolve(true);
+            },
+            err => {
+              reject(false);
+            });
+      }));
+
+      Promise.all(promises)
+        .then(() => {
+          this.dismissLoading();
+        })
+        .catch(err => console.error(err));
+    });
   }
 
   createItem(): FormGroup {
     return this.formBuilder.group({
+      id: new FormControl(new Date().getTime()),
       pieces: new FormControl(''),
       width: new FormControl(''),
       height: new FormControl('' ),
@@ -87,33 +131,16 @@ export class OrderPage implements OnInit {
     }
   }
 
-  getClient(id) {
-    this.presentLoading();
-    this.firebaseService.getClient(id).subscribe(
-      data => {
-        this.client = data;
-        this.form.controls.name.patchValue(this.client.name);
-        this.form.controls.email.patchValue(this.client.email);
-        this.form.controls.phone.patchValue(this.client.phone);
-        this.form.controls.address.patchValue(this.client.address);
-        this.form.addControl('id', new FormControl(this.client.id));
-        this.dismissLoading();
-      },
-      err => console.error(err)
-    );
-  }
-
   submit(value) {
     this.presentLoading();
-    if (this.client) {
+    if (this.order) {
       this.firebaseService
-        .updateClient(value)
+        .updateOrder(value)
         .then(() => this.savedOK(value))
         .catch(err => this.saveError(err));
     } else {
-      console.log('VALUE ', value);
       this.firebaseService
-        .createClient(value)
+        .createOrder(value)
         .then(() => this.savedOK(value))
         .catch(err => this.saveError(err));
     }
@@ -121,7 +148,7 @@ export class OrderPage implements OnInit {
 
   savedOK(value) {
     this.dismissLoading();
-    this.presentAlert('Cliente', value.name + ' guardado correctamente.');
+    this.presentAlert('Orden', 'Orden guardada correctamente.');
   }
 
   saveError(err) {
@@ -129,10 +156,10 @@ export class OrderPage implements OnInit {
     this.presentAlert('Cliente', err.toString());
   }
 
-  removeItem() {
-    const items = this.form.controls.item.value;
-    this.arrayItems.pop();
-    items.removeAt(items.length - 1);
+  removeItem(item) {
+    this.items = this.form.get('items') as FormArray;
+    const index = this.items.value.findIndex(i => i.id === item.value.id);
+    this.items.removeAt(index);
   }
 
   addItemForm() {
@@ -141,10 +168,30 @@ export class OrderPage implements OnInit {
   }
 
   updateTotal(item) {
-    item.controls.areaTotal.patchValue(item.value.width * item.value.height * item.value.pieces);
-    item.controls.areaUnit.patchValue(item.value.width * item.value.height);
-    
-    console.log(this.form);
+    if(item.value.width && item.value.height && item.value.pieces){
+      item.controls.areaTotal.patchValue(item.value.width * item.value.height * item.value.pieces);
+      item.controls.areaUnit.patchValue(item.value.width * item.value.height);
+
+      console.log(this.form);
+    }
+  }
+
+  addClient(event){
+    if(event.target.value.toLowerCase() === 'addclient')
+    {
+      this.router.navigate(['/client']);
+      this.form.controls.client.patchValue('');
+    }
+
+  }
+
+  addMaterial(event){
+    if(event.target.value.toLowerCase() === 'addmaterial')
+    {
+      this.router.navigate(['/material']);
+      this.form.controls.material.patchValue('');
+    }
+
   }
 
 }
